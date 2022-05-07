@@ -1,7 +1,7 @@
 const express = require("express")
 const dotenv = require("dotenv")
 const connectDatabase = require("./config/Database")
-const ImportData = require("./DataImport")
+
 const productRouter = require("./routes/productRoute")
 const orderRouter = require("./routes/orderRoute")
 const {notFound, errorHandler} = require("./middleware/Error")
@@ -17,7 +17,7 @@ const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({ extended: true }));
 // API
 
-app.use("/api/import", ImportData)
+
 app.use("/api/products", productRouter)
 app.use("/api/users", userRouter)
 app.use("/api/orders", orderRouter)
