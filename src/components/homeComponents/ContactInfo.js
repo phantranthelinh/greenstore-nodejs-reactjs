@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 const ContactInfo = () => {
   return (
@@ -33,7 +33,7 @@ const ContactInfo = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ContactInfo
+export default ContactInfo;

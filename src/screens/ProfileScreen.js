@@ -1,18 +1,23 @@
-import React, {useEffect} from "react"
-import {useDispatch, useSelector} from "react-redux"
-import Header from "../components/Header"
-import ProfileTabs from "../components/profileComponents/ProfileTabs"
-import {getUserDetails} from "../Redux/Actions/UserActions"
-import Orders from "./../components/profileComponents/Orders"
-import moment from "moment"
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Header from "../components/Header";
+import ProfileTabs from "../components/profileComponents/ProfileTabs";
+import { getUserDetails } from "../Redux/Actions/UserActions";
+import Orders from "./../components/profileComponents/Orders";
+import moment from "moment";
+import { listMyOrders } from "../Redux/Actions/OrderActions";
 const ProfileScreen = () => {
-  window.scrollTo(0, 0)
-  const dispatch = useDispatch()
-  const userLogin = useSelector((state) => state.userLogin)
-  const {userInfo} = userLogin
+  window.scrollTo(0, 0);
+  const dispatch = useDispatch();
+  const userLogin = useSelector((state) => state.userLogin);
+  const { userInfo } = userLogin;
+
+  const orderListMy = useSelector((state) => state.orderListMy);
+  const { loading, error, orders } = orderListMy;
   useEffect(() => {
-    dispatch(getUserDetails("profile"))
-  }, [dispatch])
+    dispatch(listMyOrders());
+    dispatch(getUserDetails("profile"));
+  }, [dispatch]);
   return (
     <>
       <Header />
@@ -30,7 +35,7 @@ const ProfileScreen = () => {
                     <strong>{userInfo?.name}</strong>
                   </h5>
                   <span className="author-card-position">
-                    <>Joined {moment(userInfo?.createAt).format("LL")}</>
+                    <>Joined {moment(userInfo?.createAt).calendar()}</>
                   </span>
                 </div>
               </div>
@@ -53,7 +58,7 @@ const ProfileScreen = () => {
                     aria-controls="v-pills-home"
                     aria-selected="true"
                   >
-                    Profile Settings
+                    Chỉnh sửa tài khoản
                   </button>
                   <button
                     class="nav-link d-flex justify-content-between"
@@ -65,8 +70,8 @@ const ProfileScreen = () => {
                     aria-controls="v-pills-profile"
                     aria-selected="false"
                   >
-                    Orders List
-                    <span className="badge2">3</span>
+                    Danh sách đơn đặt hàng
+                    <span className="badge2">{orders ? orders.length : 0}</span>
                   </button>
                 </div>
               </div>
@@ -92,13 +97,13 @@ const ProfileScreen = () => {
               role="tabpanel"
               aria-labelledby="v-pills-profile-tab"
             >
-              <Orders />
+              <Orders orders={orders} loading={loading} error={error} />
             </div>
           </div>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ProfileScreen
+export default ProfileScreen;

@@ -1,55 +1,72 @@
 import React from "react";
-const Orders = () => {
+import Loading from "../LoadingError/Loading";
+import moment from "moment";
+import Message from "../LoadingError/Error";
+import { Link } from "react-router-dom";
+const Orders = (props) => {
+  const { orders, error, loading } = props;
   return (
     <div className=" d-flex justify-content-center align-items-center flex-column">
-      {/* <div className="col-12 alert alert-info text-center mt-3">
-        No Orders
-        <Link
-          className="btn btn-success mx-2 px-3 py-2"
-          to="/"
-          style={{
-            fontSize: "12px",
-          }}
-        >
-          START SHOPPING
-        </Link>
-      </div> */}
-
-      <div className="table-responsive">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>STATUS</th>
-              <th>DATE</th>
-              <th>TOTAL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className={"alert-success"}>
-              <td>
-                <a href={`/`} className="link">
-                  1
-                </a>
-              </td>
-              <td>Paid</td>
-              <td>Dec 12 2021</td>
-              <td>$234</td>
-            </tr>
-            {/* Cancelled */}
-            <tr className={"alert-danger"}>
-              <td>
-                <a href={`/`} className="link">
-                  2
-                </a>
-              </td>
-              <td>Not Paid</td>
-              <td>Dec 12 2021</td>
-              <td>$34</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      {loading && <Loading />}
+      {error ? (
+        <Message variant="danger">{error}</Message>
+      ) : (
+        <>
+          {orders?.length === 0 ? (
+            <div className="col-12 alert alert-info text-center mt-3">
+              Không có đon đặt hàng
+              <Link
+                className="btn btn-success mx-2 px-3 py-2"
+                to="/"
+                style={{
+                  fontSize: "12px",
+                }}
+              >
+                Bắt đầu mua sắm
+              </Link>
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Mã đơn hàng</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày đặt hàng</th>
+                    <th>Tổng tiền</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders?.map((order, index) => {
+                    return (
+                      <tr key={index}
+                        className={`${
+                          order.isPaid ? "alert-success" : "alert-danger"
+                        }`}
+                      >
+                        <td>
+                          <a href={`/order/${order._id}`} className="link">
+                            {order.user.substr(-4) + "-" + order._id.substr(-7)}
+                          </a>
+                        </td>
+                        <td>
+                          {order.isPaid ? "Đã hoàn thành đặt hàng" : "chưa hoàn thành đặt hàng"}
+                        </td>
+                        <td>
+                          {order.isPaid
+                            ? moment(order.paidAt).format("DD/MM/YYYY")
+                            : moment(order.createdAt).format("DD/MM/YYYY")}
+                        </td>
+                        <td style={{color : "red"}}>{Intl.NumberFormat('VN',{maximumSignificantDigits: 3}).format(order.totalPrice)} VNĐ</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

@@ -1,29 +1,29 @@
-import React, {useEffect} from "react"
-import Header from "./../components/Header"
-import {Link} from "react-router-dom"
-import {useDispatch, useSelector} from "react-redux"
-import {addToCart, removeFromCart} from "./../Redux/Actions/CartActions"
+import React, { useEffect } from "react";
+import Header from "./../components/Header";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart, removeFromCart } from "./../Redux/Actions/CartActions";
 
-const CartScreen = ({match, location, history}) => {
-  window.scrollTo(0, 0)
-  const dispatch = useDispatch()
-  const productId = match.params.id
-  const qty = location.search ? Number(location.search.split("=")[1]) : 1
-  const cart = useSelector((state) => state.cart)
-  const {cartItems} = cart
-  const total = cartItems.reduce((a, i) => a + i.qty * i.price, 0).toFixed(2)
+const CartScreen = ({ match, location, history }) => {
+  window.scrollTo(0, 0);
+  const dispatch = useDispatch();
+  const productId = match.params.id;
+  const qty = location.search ? Number(location.search.split("=")[1]) : 1;
+  const cart = useSelector((state) => state.cart);
+  const { cartItems } = cart;
+  const total = cartItems.reduce((a, i) => a + i.qty * i.price, 0).toFixed(2);
 
   useEffect(() => {
     if (productId) {
-      dispatch(addToCart(productId, qty))
+      dispatch(addToCart(productId, qty));
     }
-  }, [dispatch, productId, qty])
+  }, [dispatch, productId, qty]);
   const HandleCheckOut = () => {
-    history.push("/login?redirect=shipping")
-  }
+    history.push("/login?redirect=shipping");
+  };
   const handleRemoveFromCart = (id) => {
-    dispatch(removeFromCart(id))
-  }
+    dispatch(removeFromCart(id));
+  };
   return (
     <>
       <Header />
@@ -31,7 +31,7 @@ const CartScreen = ({match, location, history}) => {
       <div className="container">
         {cartItems.length === 0 ? (
           <div className=" alert alert-info text-center mt-3">
-            Your cart is empty
+            Giỏ hàng của bạn đang trống
             <Link
               className="btn btn-success mx-5 px-5 py-3"
               to="/"
@@ -39,13 +39,13 @@ const CartScreen = ({match, location, history}) => {
                 fontSize: "12px",
               }}
             >
-              SHOPPING NOW
+              Mua hàng ngay
             </Link>
           </div>
         ) : (
           <>
             <div className=" alert alert-info text-center mt-3">
-              Total Cart Products
+              Tổng sản phẩm
               <Link className="text-success mx-2" to="/cart">
                 ({cartItems.length})
               </Link>
@@ -68,7 +68,7 @@ const CartScreen = ({match, location, history}) => {
                   </Link>
                 </div>
                 <div className="cart-qty col-md-2 col-sm-5 mt-md-5 mt-3 mt-md-0 d-flex flex-column justify-content-center">
-                  <h6>QUANTITY</h6>
+                  <h6>Số lượng</h6>
                   <select
                     value={item.qty}
                     onChange={(e) =>
@@ -83,25 +83,26 @@ const CartScreen = ({match, location, history}) => {
                   </select>
                 </div>
                 <div className="cart-price mt-3 mt-md-0 col-md-2 align-items-sm-end align-items-start  d-flex flex-column justify-content-center col-sm-7">
-                  <h6>PRICE</h6>
-                  <h4>${item.price}</h4>
+                  <h6>Giá</h6>
+                  <h4>{Intl.NumberFormat('VN', {maximumSignificantDigits :3}).format(item.price)} VNĐ</h4>
                 </div>
               </div>
             ))}
 
             {/* End of cart iterms */}
             <div className="total">
-              <span className="sub">total:</span>
-              <span className="total-price">${total}</span>
+              <span className="sub">Tổng tiền:</span>
+            
+              <span className="total-price" style={{color: 'red'}}>{Intl.NumberFormat('VN', { maximumSignificantDigits: 3 }).format(total)} VNĐ</span>
             </div>
             <hr />
             <div className="cart-buttons d-flex align-items-center row">
               <Link to="/" className="col-md-6 ">
-                <button>Continue To Shopping</button>
+                <button>quay lại mua hàng</button>
               </Link>
               {total > 0 && (
                 <div className="col-md-6 d-flex justify-content-md-end mt-3 mt-md-0">
-                  <button onClick={HandleCheckOut}>Checkout</button>
+                  <button onClick={HandleCheckOut}>Tiếp tục</button>
                 </div>
               )}
             </div>
@@ -109,7 +110,7 @@ const CartScreen = ({match, location, history}) => {
         )}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default CartScreen
+export default CartScreen;

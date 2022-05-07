@@ -1,23 +1,28 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "./../components/Header";
-import { PayPalButton } from "react-paypal-button-v2";
 import { useDispatch, useSelector } from "react-redux";
-import { getOrderDetails } from "../Redux/Actions/OrderActions";
+import { getOrderDetails, payOrder } from "../Redux/Actions/OrderActions";
 import Loading from "./../components/LoadingError/Loading";
 import Message from "./../components/LoadingError/Error";
 import moment from "moment";
+
 const OrderScreen = (props) => {
   window.scrollTo(0, 0);
   const { match } = props;
+
   const dispatch = useDispatch();
   const orderId = match.params.id;
+
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
 
+  const orderPay = useSelector((state) => state.orderPay);
+  const { success: successPay, loading: loadingPay } = orderPay;
+
   if (!loading) {
     const addDecimals = (num) => {
-      return (Math.round(num * 100) / 100).toFixed(2);
+      return Math.round(num * 100) / 100;
     };
     order.itemsPrice = addDecimals(
       order.orderItems.reduce((acc, item) => {
@@ -26,10 +31,19 @@ const OrderScreen = (props) => {
     );
   }
 
-
   useEffect(() => {
     dispatch(getOrderDetails(orderId));
-  }, [dispatch, orderId]);
+  }, [dispatch, orderId, successPay]);
+  const orderPayHandler = () => {
+    const paymentResult = {
+      id: orderId,
+      status: true,
+      email_address: order.user.email,
+      update_time: Date.now(),
+    };
+
+    dispatch(payOrder(orderId, paymentResult));
+  };
   return (
     <>
       <Header />
@@ -51,10 +65,11 @@ const OrderScreen = (props) => {
                   </div>
                   <div className="col-md-8 center">
                     <h5>
-                      <strong>Customer</strong>
+                      <strong>Thông tin khách hàng</strong>
                     </h5>
-                    <p>{order?.user.name}</p>
+                    <p>Tên: {order?.user.name}</p>
                     <p>
+                      Email:{" "}
                       <a href={`mailto:${order?.user.email}`}>
                         {order?.user.email}
                       </a>
@@ -72,20 +87,20 @@ const OrderScreen = (props) => {
                   </div>
                   <div className="col-md-8 center">
                     <h5>
-                      <strong>Order info</strong>
+                      <strong>Thông tin đặt hàng</strong>
                     </h5>
-                    <p>Shipping: {order?.shippingAddress.country}</p>
-                    <p>Pay method: {order?.paymentMethod}</p>
+                    <p>Hình thức thanh toán: {order?.paymentMethod}</p>
                     {order?.isPaid ? (
                       <div className="bg-info p-2 col-12">
                         <p className="text-white text-center text-sm-start">
-                          Paid on {moment(order?.createdAt).format("ll")}
+                          Hoàn thành đặt hàng vào lúc{" "}
+                          {moment(Date.now()).format("hh:mm DD/MM/YYYY")}
                         </p>
                       </div>
                     ) : (
                       <div className="bg-danger p-2 col-12">
                         <p className="text-white text-center text-sm-start">
-                          Not Paid
+                          Chưa hoàn thành đặt hàng
                         </p>
                       </div>
                     )}
@@ -102,22 +117,23 @@ const OrderScreen = (props) => {
                   </div>
                   <div className="col-md-8 center">
                     <h5>
-                      <strong>Deliver to</strong>
+                      <strong>Vận chuyển đến</strong>
                     </h5>
                     <p>
-                      Address:{" "}
+                      Địa chỉ:{" "}
                       {`${order?.shippingAddress.address}, ${order?.shippingAddress.city}, ${order?.shippingAddress.country}`}
                     </p>
                     {order.isDelivered ? (
-                      <div className="bg-danger p-1 col-12">
+                      <div className="bg-success p-1 col-12">
                         <p className="text-white text-center text-sm-start">
-                          Delivered on {moment(order.deliveredAt).calendar()}
+                          Đã vận chuyển lúc{" "}
+                          {moment(order.deliveredAt).calendar()}
                         </p>
                       </div>
                     ) : (
                       <div className="bg-danger p-1 col-12">
                         <p className="text-white text-center text-sm-start">
-                          Not Delivered
+                          Chưa vận chuyển
                         </p>
                       </div>
                     )}
@@ -130,13 +146,13 @@ const OrderScreen = (props) => {
               <div className="col-lg-8">
                 {order?.orderItems.length === 0 ? (
                   <Message variant="alert-info mt-5">
-                    Your order is empty
+                    Thông tin đặt hàng hiện đang trống
                   </Message>
                 ) : (
                   order?.orderItems.map((item, idx) => {
                     return (
-                      <div className="order-product row">
-                        <div key={idx} className="col-md-3 col-6">
+                      <div key={idx} className="order-product row">
+                        <div className="col-md-3 col-6">
                           <img src={item.image} alt={item.name} />
                         </div>
                         <div className="col-md-5 col-6 d-flex align-items-center">
@@ -145,12 +161,17 @@ const OrderScreen = (props) => {
                           </Link>
                         </div>
                         <div className="mt-3 mt-md-0 col-6 col-md-2  d-flex align-items-center flex-column justify-content-center ">
-                          <h4>QUANTITY</h4>
+                          <h4>Số lượng</h4>
                           <h6>{item.qty}</h6>
                         </div>
                         <div className="mt-3 mt-md-0 col-md-2 col-6 align-items-end  d-flex flex-column justify-content-center">
-                          <h4>SUBTOTAL</h4>
-                          <h6>{item.price}</h6>
+                          <h4>Đơn giá</h4>
+                          <h6 style={{ color: "red" }}>
+                            {Intl.NumberFormat("VN", {
+                              maximumSignificantDigits: 3,
+                            }).format(item.price)}{" "}
+                            VNĐ
+                          </h6>
                         </div>
                       </div>
                     );
@@ -163,32 +184,47 @@ const OrderScreen = (props) => {
                   <tbody>
                     <tr>
                       <td>
-                        <strong>Products</strong>
+                        <strong>Giá</strong>
                       </td>
-                      <td>${order.itemsPrice}</td>
+                      <td>
+                        {Intl.NumberFormat("VN", {
+                          maximumSignificantDigits: 3,
+                        }).format(order?.itemsPrice)}{" "}
+                        VNĐ
+                      </td>
                     </tr>
                     <tr>
                       <td>
-                        <strong>Shipping</strong>
+                        <strong>Chi phí vận chuyển</strong>
                       </td>
-                      <td>${order?.shippingPrice}</td>
+                      {order?.shippingPrice == 0 ? (
+                        <td>Free</td>
+                      ) : (
+                        <td>
+                          {Intl.NumberFormat("VN", {
+                            maximumSignificantDigits: 3,
+                          }).format(order?.shippingPrice)}{" "}
+                          VNĐ
+                        </td>
+                      )}
                     </tr>
                     <tr>
                       <td>
-                        <strong>Tax</strong>
+                        <strong>Tổng cộng</strong>
                       </td>
-                      <td>${order?.taxPrice}</td>
-                    </tr>
-                    <tr>
                       <td>
-                        <strong>Total</strong>
+                        {Intl.NumberFormat("VN", {
+                          maximumSignificantDigits: 3,
+                        }).format(order?.totalPrice)}{" "}
+                        VNĐ
                       </td>
-                      <td>${order?.totalPrice}</td>
                     </tr>
                   </tbody>
                 </table>
+
                 <div className="col-12">
-                  <PayPalButton amount={345} />
+                  {loadingPay && <Loading />}
+                  <button onClick={orderPayHandler}>Thanh Toán</button>
                 </div>
               </div>
             </div>

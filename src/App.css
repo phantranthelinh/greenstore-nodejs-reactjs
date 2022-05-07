@@ -165,7 +165,6 @@ textarea:focus {
   position: relative;
   overflow: hidden;
   width: 100%;
-  background-color: #f3fbf7;
 }
 .shopBack img {
   width: 100%;
@@ -284,7 +283,6 @@ textarea:focus {
   margin-bottom: 50px;
 }
 .single-image {
-  background-color: #f3fbf7;
   margin-right: 20px;
   height: 700px;
   display: flex;

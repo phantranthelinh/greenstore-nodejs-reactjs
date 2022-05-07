@@ -1,30 +1,30 @@
-import React, {useEffect, useState} from "react"
-import {useDispatch, useSelector} from "react-redux"
-import {Link} from "react-router-dom"
-import {login} from "../Redux/Actions/UserActions"
-import Header from "./../components/Header"
-import Message from "./../components/LoadingError/Error"
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { login } from "../Redux/Actions/UserActions";
+import Header from "./../components/Header";
+import Message from "./../components/LoadingError/Error";
 
-const Login = ({location, history}) => {
-  window.scrollTo(0, 0)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+const Login = ({ location, history }) => {
+  window.scrollTo(0, 0);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const redirect = location.search ? location.search.split("=")[1] : "/"
+  const redirect = location.search ? location.search.split("=")[1] : "/";
 
-  const userLogin = useSelector((state) => state.userLogin)
-  const {error, userInfo} = userLogin
-  const dispatch = useDispatch()
+  const userLogin = useSelector((state) => state.userLogin);
+  const { error, userInfo } = userLogin;
+  const dispatch = useDispatch();
   useEffect(() => {
     if (userInfo) {
-      history.push(redirect)
+      history.push(redirect);
     }
-  }, [userInfo, history, redirect])
+  }, [userInfo, history, redirect]);
 
   const submitHandler = (e) => {
-    e.preventDefault()
-    dispatch(login(email, password))
-  }
+    e.preventDefault();
+    dispatch(login(email, password));
+  };
   return (
     <>
       <Header />
@@ -41,21 +41,21 @@ const Login = ({location, history}) => {
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Mật khẩu"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button type="submit">Login</button>
+          <button type="submit">Đăng nhập</button>
           <p>
             <Link
               to={redirect ? `/register?redicrect=${redirect}` : "/register"}
             >
-              Create Account
+              Tạo tài khoản
             </Link>
           </p>
         </form>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

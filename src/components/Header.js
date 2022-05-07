@@ -1,18 +1,30 @@
-import React, {useEffect} from "react"
-import {useDispatch, useSelector} from "react-redux"
-import {Link} from "react-router-dom"
-import {logout} from "../Redux/Actions/UserActions"
+import React, { useState } from "react";
+import { Link, useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../Redux/Actions/UserActions";
 
 const Header = () => {
-  const cart = useSelector((state) => state.cart)
-  const {cartItems} = cart
-  const dispatch = useDispatch()
-  const userLogin = useSelector((state) => state.userLogin)
-  const {userInfo} = userLogin
+  const [keyword, setKeyword] = useState();
+  const dispatch = useDispatch();
+  let history = useHistory();
+
+  const cart = useSelector((state) => state.cart);
+  const { cartItems } = cart;
+  const userLogin = useSelector((state) => state.userLogin);
+  const { userInfo } = userLogin;
+
   const logoutHandler = () => {
-    dispatch(logout())
-  }
-  useEffect(() => {}, [userInfo])
+    dispatch(logout());
+  };
+  
+  const submitHandler = (e) => {
+    e.preventDefault();
+    if (keyword.trim()) {
+      history.push(`/search/${keyword.trim()}`);
+    } else {
+      history.push("/");
+    }
+  };
   return (
     <div>
       {/* Top Header */}
@@ -20,24 +32,18 @@ const Header = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-6 d-flex align-items-center display-none">
-              <p>+0766 865 878</p>
-              <p>info@greenstore.com</p>
+              <p>+84 766 865 878</p>
+              <p>info@thelinhz</p>
             </div>
             <div className=" col-12 col-lg-6 justify-content-center justify-content-lg-end d-flex align-items-center">
-              <Link to="https://www.facebook.com/Thelinh.Info/">
+              <a href="https://www.facebook.com/Thelinh.Info">
                 <i className="fab fa-facebook-f"></i>
-              </Link>
-              <Link to="">
+              </a>
+              <a href="https://www.instagram.com/jjkjk.19/">
                 <i className="fab fa-instagram"></i>
-              </Link>
+              </a>
               <Link to="">
                 <i className="fab fa-linkedin-in"></i>
-              </Link>
-              <Link to="">
-                <i className="fab fa-youtube"></i>
-              </Link>
-              <Link to="">
-                <i className="fab fa-pinterest-p"></i>
               </Link>
             </div>
           </div>
@@ -65,11 +71,11 @@ const Header = () => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        {userInfo?.name}
+                        <i class="fas fa-user"></i>
                       </button>
                       <div className="dropdown-menu">
                         <Link className="dropdown-item" to="/profile">
-                          Profile
+                          Tài khoản
                         </Link>
 
                         <Link
@@ -77,7 +83,7 @@ const Header = () => {
                           to="#"
                           onClick={logoutHandler}
                         >
-                          Logout
+                          Đăng xuất
                         </Link>
                       </div>
                     </div>
@@ -94,11 +100,11 @@ const Header = () => {
                       </button>
                       <div className="dropdown-menu">
                         <Link className="dropdown-item" to="/login">
-                          Login
+                          Đăng nhập
                         </Link>
 
                         <Link className="dropdown-item" to="/register">
-                          Register
+                          Đăng ký
                         </Link>
                       </div>
                     </div>
@@ -110,14 +116,16 @@ const Header = () => {
                   </Link>
                 </div>
                 <div className="col-12 d-flex align-items-center">
-                  <form className="input-group">
+                  <form onSubmit={submitHandler} className="input-group">
                     <input
                       type="search"
                       className="form-control rounded search"
-                      placeholder="Search"
+                      placeholder="Tìm kiếm..."
+                      required
+                      onChange={(e) => setKeyword(e.target.value)}
                     />
                     <button type="submit" className="search-button">
-                      search
+                      Tìm kiếm
                     </button>
                   </form>
                 </div>
@@ -134,14 +142,16 @@ const Header = () => {
                 </Link>
               </div>
               <div className="col-md-6 col-8 d-flex align-items-center">
-                <form className="input-group">
+                <form onSubmit={submitHandler} className="input-group">
                   <input
                     type="search"
                     className="form-control rounded search"
-                    placeholder="Search"
+                    required
+                    placeholder="Tìm kiếm "
+                    onChange={(e) => setKeyword(e.target.value)}
                   />
                   <button type="submit" className="search-button">
-                    search
+                    Tìm kiếm
                   </button>
                 </form>
               </div>
@@ -155,11 +165,11 @@ const Header = () => {
                       aria-haspopup="true"
                       aria-expanded="false"
                     >
-                      {`Hi, ${userInfo.name}`}
+                      Hi, {userInfo.name}
                     </button>
                     <div className="dropdown-menu">
                       <Link className="dropdown-item" to="/profile">
-                        Profile
+                        Tài khoản
                       </Link>
 
                       <Link
@@ -167,15 +177,14 @@ const Header = () => {
                         to="#"
                         onClick={logoutHandler}
                       >
-                        Logout
+                        Đăng xuất
                       </Link>
                     </div>
                   </div>
                 ) : (
                   <>
-                    <Link to="/login">Login</Link>
-
-                    <Link to="/register">Register</Link>
+                    <Link to="/register">Đăng ký</Link>
+                    <Link to="/login">Đăng nhập</Link>
                   </>
                 )}
 
@@ -189,7 +198,7 @@ const Header = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

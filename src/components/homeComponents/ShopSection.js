@@ -1,21 +1,22 @@
-import React, {useEffect} from "react"
-import {Link} from "react-router-dom"
-import Rating from "./Rating"
-import Pagination from "./pagination"
-import {useDispatch, useSelector} from "react-redux"
-import {listProduct} from "../../Redux/Actions/ProductActions"
-import Loading from "../LoadingError/Loading"
-import Message from "../LoadingError/Error"
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import Rating from "./Rating";
+import Pagination from "./pagination";
+import { useDispatch, useSelector } from "react-redux";
+import { listProduct } from "../../Redux/Actions/ProductActions";
+import Loading from "../LoadingError/Loading";
+import Message from "../LoadingError/Error";
 
-const ShopSection = () => {
-  const dispatch = useDispatch()
-  const productList = useSelector((state) => state.productList)
-  const {loading, error, products} = productList
+const ShopSection = (props) => {
+  const { keyword, pagenumber } = props;
+  const dispatch = useDispatch();
+  const productList = useSelector((state) => state.productList);
+  const { loading, error, products, page, pages } = productList;
   useEffect(() => {
-    dispatch(listProduct())
-  }, [dispatch])
+    dispatch(listProduct(keyword, pagenumber));
+  }, [dispatch, keyword, pagenumber]);
   return (
-    <>
+    <>  
       <div className="container">
         <div className="section">
           <div className="row">
@@ -52,7 +53,7 @@ const ShopSection = () => {
                               value={product.rating}
                               text={`${product.numReviews} reviews`}
                             />
-                            <h3>${product.price}</h3>
+                            <h3 style={{color: "red"}} >{ Intl.NumberFormat('VN', { maximumSignificantDigits: 3 }).format(product.price )} VNĐ</h3>
                           </div>
                         </div>
                       </div>
@@ -61,14 +62,18 @@ const ShopSection = () => {
                 )}
 
                 {/* Pagination */}
-                <Pagination />
+                <Pagination
+                  page={page}
+                  pages={pages}
+                  keyword={keyword ? keyword : ""}
+                />
               </div>
             </div>
           </div>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ShopSection
+export default ShopSection;
